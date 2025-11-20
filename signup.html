@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Signup</title>
+</head>
+<body>
+  <h1>Create Account</h1>
+
+  <form id="signupForm">
+    <input type="text" placeholder="Name" id="name"><br>
+    <input type="email" placeholder="Email" id="email"><br>
+    <input type="password" placeholder="Password" id="password"><br>
+    <button type="submit">Signup</button>
+  </form>
+
+  <script>
+    document.getElementById("signupForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const res = await fetch("https://accsbid.onrender.com/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: document.getElementById("name").value,
+          email: document.getElementById("email").value,
+          password: document.getElementById("password").value
+        })
+      });
+      alert(await res.text());
+    });
+  </script>
+</body>
+</html>
