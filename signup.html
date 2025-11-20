@@ -1,32 +1,31 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Signup</title>
-</head>
-<body>
-  <h1>Create Account</h1>
+<script>
+document.getElementById("signupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  <form id="signupForm">
-    <input type="text" placeholder="Name" id="name"><br>
-    <input type="email" placeholder="Email" id="email"><br>
-    <input type="password" placeholder="Password" id="password"><br>
-    <button type="submit">Signup</button>
-  </form>
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
-  <script>
-    document.getElementById("signupForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const res = await fetch("https://accsbid.onrender.com/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: document.getElementById("name").value,
-          email: document.getElementById("email").value,
-          password: document.getElementById("password").value
-        })
-      });
-      alert(await res.text());
-    });
-  </script>
-</body>
-</html>
+    const payload = { username, email, password };
+
+    try {
+        const res = await fetch("https://accsbid.onrender.com/api/auth/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || "Signup failed");
+            return;
+        }
+
+        alert("Signup successful!");
+        window.location.href = "login.html";
+    } catch (err) {
+        alert("Error connecting to server");
+    }
+});
+          </script>
