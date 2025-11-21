@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACCS BID - Dashboard</title>
+
+    <link rel="stylesheet" href="public/css/style.css">
+
+    <style>
+        .dashboard-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .welcome {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .logout-btn {
+            float: right;
+            padding: 10px 16px;
+            background: #e63946;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #d62828;
+        }
+
+        .auction-box {
+            margin-top: 25px;
+        }
+
+        .auction-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+
+        .auction-item button {
+            background: #2196f3;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .auction-item button:hover {
+            background: #1976d2;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <button class="logout-btn" onclick="logout()">Logout</button>
+
+        <p class="welcome">Welcome, <span id="userName"></span> 👋</p>
+
+        <h3>Available Auctions</h3>
+
+        <div class="auction-box" id="auctionList">
+            <!-- Auctions will load here -->
+        </div>
+
+    </div>
+
+    <script>
+        const BACKEND = "https://accsbid-backend.onrender.com";
+
+        // Load user data from localStorage
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        if (!user) {
+            window.location.href = "login.html";
+        }
+
+        document.getElementById("userName").innerText = user.username;
+
+        // Logout
+        function logout() {
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        }
+
+        // Load auctions
+        async function loadAuctions() {
+            try {
+                const res = await fetch(`${BACKEND}/api/auctions`);
+                const data = await res.json();
+
+                const box = document.getElementById("auctionList");
+                box.innerHTML = ""; // clear
+
+                data.forEach(item => {
+                    box.innerHTML += `
+                        <div class="auction-item">
+                            <h4>${item.title}</h4>
+                            <p>${item.description}</p>
+                            <p><strong>Current Price:</strong> $${item.currentPrice}</p>
+                            <button onclick="bid(${item.id})">Place Bid</button>
+                        </div>
+                    `;
+                });
+
+            } catch (e) {
+                alert("Error loading auctions.");
+            }
+        }
+
+        // Bid function
+        async function bid(id) {
+            const amount = prompt("Enter your bid amount:");
+            if (!amount) return;
+
+            try {
+                const res = await fetch(`${BACKEND}/api/bid`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        auctionId: id,
+                        bidAmount: amount
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert("Bid placed successfully!");
+                    loadAuctions();
+                } else {
+                    alert(data.message || "Failed to bid.");
+                }
+
+            } catch (e) {
+                alert("Network error.");
+            }
+        }
+
+        loadAuctions();
+    </script>
+
+</body>
+</html>
