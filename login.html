@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - ACCS BID</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <form id="login-form">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+  </form>
+
+  <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
+
+  <script>
+    const loginForm = document.getElementById('login-form');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('https://accsbid-backend.onrender.com/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+        alert(data.message);
+      } catch (err) {
+        alert('Error connecting to backend');
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
